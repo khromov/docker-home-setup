@@ -1,4 +1,4 @@
-#### A home setup with Docker and Docker-compose
+#### A home setup using Docker, docker-compose, Let's Encrypt and Caddy
 
 ##### Components:
 
