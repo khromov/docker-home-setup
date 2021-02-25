@@ -1,0 +1,2 @@
+your-domain.com
+reverse_proxy unifi-controller:8080
