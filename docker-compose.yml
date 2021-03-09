@@ -26,8 +26,24 @@ services:
       - 8880:8880 #optional
       - 6789:6789 #optional
       - 5514:5514/udp #optional
-    restart: unless-stopped
+    restart: "no"
   sendgrid-proxy:
     image: fgribreau/smtp-to-sendgrid-gateway:latest
     env_file:
       - ./env/unifi-controller.env
+  plex:
+    image: linuxserver/plex
+    container_name: plex
+    # network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - VERSION=docker
+      - PLEX_CLAIM= # https://www.plex.tv/claim/
+    volumes:
+      -  ${PWD}/data/plex/config:/config
+      -  ${PWD}/data/plex/tv:/tv
+      -  ${PWD}/data/plex/movies:/movies
+    ports:
+      - 32400:32400
+    restart: "no"
