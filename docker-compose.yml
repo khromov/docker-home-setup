@@ -9,10 +9,12 @@ services:
   #    - ${PWD}/Caddyfile:/etc/caddy/Caddyfile
   #    - ${PWD}/data/caddy:/data
   unifi-controller:
-    image: linuxserver/unifi-controller:version-6.0.45
+    image: ghcr.io/linuxserver/unifi-controller:version-6.0.45
+    container_name: unifi
     environment:
       - PUID=1000
       - PGID=1000
+      - TZ=Europe/Stockholm
       # - MEM_LIMIT=1024M #optional
     volumes:
       - ${PWD}/data/unifi:/config
@@ -32,7 +34,7 @@ services:
     env_file:
       - ./env/unifi-controller.env
   plex:
-    image: linuxserver/plex
+    image: ghcr.io/linuxserver/plex
     container_name: plex
     # network_mode: host
     environment:
@@ -40,10 +42,40 @@ services:
       - PGID=1000
       - VERSION=docker
       - PLEX_CLAIM= # https://www.plex.tv/claim/
+      - TZ=Europe/Stockholm
     volumes:
       -  ${PWD}/data/plex/config:/config
-      -  ${PWD}/data/plex/tv:/tv
-      -  ${PWD}/data/plex/movies:/movies
+      -  ${PWD}/data/media/tv:/tv
+      -  ${PWD}/data/media/movies:/movies
     ports:
       - 32400:32400
+    restart: "no"
+  sonarr:
+    image: ghcr.io/linuxserver/sonarr
+    container_name: sonarr
+    environment:
+      - PUID=0 # https://github.com/linuxserver/docker-sonarr/issues/73
+      - PGID=0 # TODO: https://docs.linuxserver.io/general/understanding-puid-and-pgid
+      - TZ=Europe/Stockholm
+    volumes:
+      - ${PWD}/data/sonarr:/config:rw
+      - ${PWD}/data/media/tv:/tv:rw
+      - ${PWD}/data/media/movies:/movies:rw
+    ports:
+      - 8989:8989
+    restart: "no"
+  # TODO: Check re: umask https://hub.docker.com/r/linuxserver/nzbget
+  # login:nzbget, password:tegbzn6789
+  nzbget: 
+    image: ghcr.io/linuxserver/nzbget
+    container_name: nzbget
+    environment:
+      - PUID=0 # TODO: https://docs.linuxserver.io/general/understanding-puid-and-pgid
+      - PGID=0
+      - TZ=Europe/Stockholm
+    volumes:
+      - ${PWD}/data/nzbget:/config
+      - ${PWD}/data/media/downloads:/downloads
+    ports:
+      - 6790:6789
     restart: "no"
